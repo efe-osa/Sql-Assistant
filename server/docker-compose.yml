@@ -13,7 +13,7 @@ services:
       context: .
       dockerfile: ./Dockerfile
     ports:
-      - "5000:5000"
+      - "3001:3001"
     env_file:
       - .env.local
     depends_on:
@@ -23,19 +23,18 @@ services:
       - sql-assistant-network
 
   sqlite:
-    container_name: sql-assistant-sqlite
-    build:
-      context: .
-      dockerfile: ./Dockerfile.sqlite
-    stdin_open: true       # Allows interactive input
-    tty: true
+    image: nouchka/sqlite3:latest
+    container_name: sqlite-db
     ports:
       - "8080:8080"
     volumes:
+      - ./sqlite_data/init-cars-db.sh:/db/init-cars-db.sh
+      - ./sqlite_data/car_db.sql:/db/car_db.sql
       - sqlite_data:/db
-      - ./db/init-cars-db.sh:/db/init-cars-db.sh
+    entrypoint: >
+      sh -c "sqlite3 cars.db < /db/car_db.sql && tail -f /dev/null"
     healthcheck:
-      test: ["CMD", "sqlite3", "/db/car_db.sqlite", ".tables"]
+      test: ["CMD", "sqlite3", "/db/cars.db", ".tables"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -57,7 +56,7 @@ services:
     security_opt:
       - seccomp:unconfined #optional
     volumes:
-      - sqlite_data:/db/car_db.sqlite
+      - sqlite_data:/db/cars.db
     ports:
       - 4000:4000
       - 4001:4001

@@ -2,7 +2,7 @@ import { DataSource } from 'typeorm';
 import { SqlDatabase } from 'langchain/sql_db';
 import { logger } from '../utils/logger';
 import config from '../config';
-import { CarVin, CarOption, CarPart, Model, Brand, DealerBrand, ManufacturePlant, Customer } from '../entities';
+// import { CarVin, CarOption, CarPart, Model, Brand, DealerBrand, ManufacturePlant, Customer, CustomerOwnership, Dealer } from '../entities';
 
 let db: SqlDatabase;
 
@@ -13,7 +13,7 @@ export const connectDB = async () => {
             database: config.SQLITE_DB_PATH,
             synchronize: true,
             logging: true,
-            entities: [CarVin, CarOption, CarPart, Model, Brand, DealerBrand, ManufacturePlant, Customer]
+            // entities: [CarVin, CarOption, CarPart, Model, Brand, DealerBrand, ManufacturePlant, Customer, CustomerOwnership, Dealer]
         });
 
         await dataSource.initialize();

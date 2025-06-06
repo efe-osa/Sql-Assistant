@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const config = {
-    PORT: process.env.PORT || 5000,
+    PORT: process.env.PORT || 3001,
     NODE_ENV: process.env.NODE_ENV || 'development',
     SQLITE_DB_PATH: process.env.SQLITE_DB_PATH || './db/car_db.sqlite',
     TOGETHER_API_KEY: process.env.TOGETHERAI_API_KEY || 'sk-none',

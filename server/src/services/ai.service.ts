@@ -28,8 +28,8 @@ class AIService {
             this.sqlQueryPrompt,
             this.llm.withConfig({
                 configurable: {
-                    stop: ['```sql'],
-                    start: ['```']
+                    start: ['```sql'],
+                    stop: ['```']
                 }
             }),
             new StringOutputParser()
@@ -39,7 +39,7 @@ class AIService {
     async generateSQLQuery(userPrompt: string): Promise<string> {
         try {
             const chainResult = await this.sqlQueryGeneratorChain.invoke({
-                question: userPrompt
+                question: userPrompt,
             });
 
             console.log('chainResult:>>>>', chainResult);
@@ -60,7 +60,7 @@ class AIService {
 
         const fullChain = RunnableSequence.from([
             RunnablePassthrough.assign({
-                query: this.sqlQueryGeneratorChain
+                query: this.sqlQueryGeneratorChain.invoke(),
             }),
             {
                 schema: async () => await db.getTableInfo(),
@@ -69,14 +69,16 @@ class AIService {
                 response: async (input: { query: string }) => await db.run(input.query)
             },
             finalResponsePrompt,
-            this.llm
+            this.llm,
+            new StringOutputParser()
         ]);
 
         const finalResponse = await fullChain.invoke({
             question: queryDescription + "?"
         });
 
-        return finalResponse;
+        console.log("", finalResponse)
+        return finalResponse.trim();
     }
 }
 
