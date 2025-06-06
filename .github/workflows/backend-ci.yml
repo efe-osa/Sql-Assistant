@@ -44,10 +44,12 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18.x'
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: server/package-lock.json
 
       - name: Install dependencies
-        working-directory: /server
+        working-directory: ./server
         run: npm install
 
       - name: Run Snyk security scan
@@ -69,18 +71,18 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
-          cache-dependency-path: /server/package-lock.json
+          cache-dependency-path: server/package-lock.json
 
       - name: Install dependencies
-        working-directory: /server
+        working-directory: ./server
         run: npm install
 
       - name: Run linting
-        working-directory: /server
+        working-directory: ./server
         run: npm run lint
 
       - name: Run tests
-        working-directory: /server
+        working-directory: ./server
         run: npm test
 
   build-and-push:
@@ -116,8 +118,8 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
-          context: /server
-          file: /server/Dockerfile
+          context: ./server
+          file: ./Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
