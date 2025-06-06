@@ -1,0 +1,66 @@
+version: '3.8'
+
+networks:
+  sql-assistant-network:
+    driver: bridge
+
+volumes:
+  sqlite_data:
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    ports:
+      - "5000:5000"
+    env_file:
+      - .env.local
+    depends_on:
+      sqlite:
+        condition: service_healthy
+    networks:
+      - sql-assistant-network
+
+  sqlite:
+    container_name: sql-assistant-sqlite
+    build:
+      context: .
+      dockerfile: ./Dockerfile.sqlite
+    stdin_open: true       # Allows interactive input
+    tty: true
+    ports:
+      - "8080:8080"
+    volumes:
+      - sqlite_data:/db
+      - ./db/init-cars-db.sh:/db/init-cars-db.sh
+    healthcheck:
+      test: ["CMD", "sqlite3", "/db/car_db.sqlite", ".tables"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - sql-assistant-network
+
+  sqlitebrowser:
+    image: lscr.io/linuxserver/sqlitebrowser:latest
+    container_name: sqlitebrowser
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - CUSTOM_HTTP_PORT=4000
+      - CUSTOM_HTTPS_PORT=4001
+    depends_on:
+      sqlite:
+        condition: service_healthy
+    security_opt:
+      - seccomp:unconfined #optional
+    volumes:
+      - sqlite_data:/db/car_db.sqlite
+    ports:
+      - 4000:4000
+      - 4001:4001
+    restart: unless-stopped
+    networks:
+      - sql-assistant-network
