@@ -1,8 +1,5 @@
-"use strict";
-
-// TODO: convert this file to an es2020 file
-
-import express, { Request, Response } from 'express';
+import 'reflect-metadata';
+import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import compression from 'compression';
@@ -23,14 +20,14 @@ app.use(compression());
 app.use(express.json());
 app.use(rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100, // limit each IP to 100 requests per windowMs
+    max: 100 // limit each IP to 100 requests per windowMs
 }));
 
 // Routes
 app.use('/api/sql', sqlRouter);
 
 // Health check endpoint
-app.get('/health', (req: Request, res: Response) => {
+app.get('/health', (req, res) => {
     res.json({ status: 'ok' });
 });
 
@@ -38,7 +35,7 @@ app.get('/health', (req: Request, res: Response) => {
 app.use(errorHandler);
 
 // Start server
-const startServer = async (): Promise<void> => {
+const startServer = async () => {
     try {
         // Connect to database
         await connectDB();
@@ -52,4 +49,3 @@ const startServer = async (): Promise<void> => {
 };
 
 startServer();
-//# sourceMappingURL=index.js.map
