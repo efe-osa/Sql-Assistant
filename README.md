@@ -1,6 +1,9 @@
-# SQL Assistant [![Netlify Status](https://api.netlify.com/api/v1/badges/87f74d8b-6a28-4eb8-bd02-c051e6bd9604/deploy-status)](https://app.netlify.com/projects/sql-assistant/deploys)
+# SQL Assistant
 
 A SQL query assistant that helps users write, optimize, and understand SQL queries through natural language interaction.
+
+<https://sql-assistant.netlify.app/> [![Netlify Status](https://api.netlify.com/api/v1/badges/5c3dc2cc-29ea-4400-b80d-9d59c731c61b/deploy-status)](https://app.netlify.com/projects/sql-assistant/deploys)
+<https://sql-assistant-server.netlify.app/>[![Netlify Status](https://api.netlify.com/api/v1/badges/87f74d8b-6a28-4eb8-bd02-c051e6bd9604/deploy-status)](https://app.netlify.com/projects/sql-assistant-server/deploys)
 
 ## Features
 
@@ -61,7 +64,7 @@ A SQL query assistant that helps users write, optimize, and understand SQL queri
 
    # Start the frontend development server
    cd ../client
-   echo "VITE_API_URL=http://localhost:5000/api" >> .env.development
+   echo "VITE_API_URL=http://localhost:3001/api" >> .env.development
    npm run dev
    ```
 
