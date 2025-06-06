@@ -1,4 +1,4 @@
-# SQL Assistant
+# SQL Assistant [![Netlify Status](https://api.netlify.com/api/v1/badges/87f74d8b-6a28-4eb8-bd02-c051e6bd9604/deploy-status)](https://app.netlify.com/projects/sql-assistant/deploys)
 
 A SQL query assistant that helps users write, optimize, and understand SQL queries through natural language interaction.
 
