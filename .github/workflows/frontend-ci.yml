@@ -4,23 +4,63 @@ on:
   push:
     branches: [ main ]
     paths:
-      - 'frontend/**'
-      - 'docker/frontend/**'
+      - 'client/**'
       - '.github/workflows/frontend-ci.yml'
   pull_request:
     branches: [ main ]
     paths:
-      - 'frontend/**'
-      - 'docker/frontend/**'
+      - 'client/**'
       - '.github/workflows/frontend-ci.yml'
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}/ai-dev-assistant-frontend
+  IMAGE_NAME: ${{ github.repository }}/sql-assistant-frontend
 
 jobs:
+  check-changes:
+    name: Check for Frontend Changes
+    runs-on: ubuntu-latest
+    outputs:
+      has_changes: ${{ steps.filter.outputs.client }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            client:
+              - 'client/**'
+              - '.github/workflows/frontend-ci.yml'
+
+  security-scan:
+    name: Security Scan
+    needs: check-changes
+    if: ${{ needs.check-changes.outputs.has_changes == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: client/package-lock.json
+
+      - name: Install dependencies
+        working-directory: ./client
+        run: npm install
+
+      - name: Run Snyk security scan
+        uses: snyk/actions/node@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+
   test:
     name: Test and Lint
+    needs: check-changes
+    if: ${{ needs.check-changes.outputs.has_changes == 'true' }}
     runs-on: ubuntu-latest
 
     steps:
@@ -31,23 +71,24 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
-          cache-dependency-path: frontend/package-lock.json
+          cache-dependency-path: client/package-lock.json
 
       - name: Install dependencies
-        working-directory: ./frontend
+        working-directory: ./client
         run: npm install
 
       - name: Run linting
-        working-directory: ./frontend
+        working-directory: ./client
         run: npm run lint
 
       - name: Run tests
-        working-directory: ./frontend
+        working-directory: ./client
         run: npm test
 
   build-and-push:
     name: Build and Push Docker Image
-    needs: test
+    needs: [check-changes, test]
+    if: ${{ needs.check-changes.outputs.has_changes == 'true' }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -77,8 +118,8 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
-          context: ./frontend
-          file: ./docker/frontend/Dockerfile
+          context: ./client
+          file: ./Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

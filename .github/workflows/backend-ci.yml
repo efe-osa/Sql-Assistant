@@ -14,11 +14,53 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}/server
+  IMAGE_NAME: ${{ github.repository }}/sql-assistant-server
 
 jobs:
+  check-changes:
+    name: Check for Backend Changes
+    runs-on: ubuntu-latest
+    outputs:
+      has_changes: ${{ steps.filter.outputs.server }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            server:
+              - 'server/**'
+              - '.github/workflows/backend-ci.yml'
+
+  security-scan:
+    name: Security Scan
+    needs: check-changes
+    if: ${{ needs.check-changes.outputs.has_changes == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: server/package-lock.json
+
+      - name: Install dependencies
+        working-directory: ./server
+        run: npm install
+
+      - name: Run Snyk security scan
+        uses: snyk/actions/node@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+
   test:
     name: Test and Lint
+    needs: check-changes
+    if: ${{ needs.check-changes.outputs.has_changes == 'true' }}
     runs-on: ubuntu-latest
 
     steps:
@@ -45,7 +87,8 @@ jobs:
 
   build-and-push:
     name: Build and Push Docker Image
-    needs: test
+    needs: [check-changes, test]
+    if: ${{ needs.check-changes.outputs.has_changes == 'true' }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
