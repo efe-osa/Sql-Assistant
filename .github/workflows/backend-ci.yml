@@ -17,6 +17,26 @@ env:
   IMAGE_NAME: ${{ github.repository }}/server
 
 jobs:
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18.x'
+
+      - name: Install dependencies
+        working-directory: ./server
+        run: npm install
+
+      - name: Run Snyk security scan
+        uses: snyk/actions/node@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
   test:
     name: Test and Lint
     runs-on: ubuntu-latest
