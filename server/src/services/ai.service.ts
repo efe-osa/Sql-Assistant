@@ -18,7 +18,7 @@ class AIService {
         });
 
         this.sqlQueryPrompt = PromptTemplate.fromTemplate(
-            "Based on the table schema below, write an exact SQL query that would answer the user's question. Return only the SQL and nothing else:\n    {schema}\n\n    Question: {question}\n    SQL Query:"
+            "Act as a SQL expert. Based on the table schema below, write an exact SQL query that would answer the user's question. Return only the SQL query and nothing else:\n    {schema}\n\n    Question: {question}\n    SQL Query:"
         );
 
         this.sqlQueryGeneratorChain = RunnableSequence.from([
@@ -55,12 +55,12 @@ class AIService {
 
     async generateNaturalLanguageResponse(queryDescription: string): Promise<string> {
         const finalResponsePrompt = PromptTemplate.fromTemplate(
-            "Based on the table schema below, question, sql query, and sql response, write a natural language response:\n    {schema}\n\n    Question: {question}\n    SQL Query: {query}\n    SQL Response: {response}"
+            "Act as a SQL expert. Based on the table schema below, question, sql query, and sql response, write a natural language response:\n    {schema}\n\n    Question: {question}\n    SQL Query: {query}\n    SQL Response: {response}"
         );
 
         const fullChain = RunnableSequence.from([
             RunnablePassthrough.assign({
-                query: this.sqlQueryGeneratorChain.invoke(),
+                query: this.sqlQueryGeneratorChain
             }),
             {
                 schema: async () => await db.getTableInfo(),
