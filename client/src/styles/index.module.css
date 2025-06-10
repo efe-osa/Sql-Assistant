@@ -89,6 +89,24 @@
   cursor: pointer;
 }
 
+.main .btnText:hover {
+  background: none;
+  transform: translateY(1px);
+}
+.main .btnText {
+  padding: .5rem 0;
+  color: var(--color-primary);
+  margin-bottom: 1.5rem;
+  background: none;
+  border: none;
+  font-size: .75rem;
+  border-radius: 4px;
+  transition: transform 0.1s all ease-in-out;
+  text-align: center;
+  width: 100%;
+  cursor: pointer;
+}
+
 .main .btnGroup {
   display: flex;
   gap: 10px;

@@ -37,10 +37,28 @@ function App() {
     return data.response.trim();
   };
 
+  const openWindowPrompt = async () => {
+    const url = prompt('Enter the URL of the database you want to add');
+    const name = prompt('Enter the name of the database you want to add');
+    if (url && name) {
+      const data = await apiFetch('/sql/add-database', {
+        method: 'POST',
+        data: { databaseUrl: url, databaseName: name },
+      });
+      console.log(data);
+      alert('Database added successfully');
+    }
+  };
+
   return (
     <main className={styles.main}>
       <img src={sqlLogo} className={styles.icon}></img>
       <h3 className={styles.heading}>SQL Assistant</h3>
+      <div>
+        <button onClick={openWindowPrompt} className={styles.btnText} type="submit" name="add-database" value="Add Database">
+          Add Database using URL
+        </button>
+      </div>
       <form className={styles.form} onSubmit={onSubmit}>
         <input
           type="text"
