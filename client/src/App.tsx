@@ -53,12 +53,13 @@ function App() {
   return (
     <main className={styles.main}>
       <img src={sqlLogo} className={styles.icon}></img>
-      <h3 className={styles.heading}>SQL Assistant</h3>
-      <div>
+      <h3 className={styles.heading}>
+        SQL Assistant
+      </h3>
+        <small>Current Database: cars.db</small>
         <button onClick={openWindowPrompt} className={styles.btnText} type="submit" name="add-database" value="Add Database">
           Add Database using URL
         </button>
-      </div>
       <form className={styles.form} onSubmit={onSubmit}>
         <input
           type="text"
