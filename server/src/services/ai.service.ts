@@ -1,4 +1,4 @@
-import { TogetherAI } from '@langchain/community/llms/togetherai';
+import { ChatTogetherAI } from '@langchain/community/chat_models/togetherai';
 import { PromptTemplate } from '@langchain/core/prompts';
 import { StringOutputParser } from '@langchain/core/output_parsers';
 import { RunnableSequence, RunnablePassthrough } from '@langchain/core/runnables';
@@ -8,7 +8,7 @@ import config from '../config';
 
 class AIService {
     private static instance: AIService;
-    private llm!: TogetherAI;
+    private llm!: ChatTogetherAI;
     private sqlQueryPrompt!: PromptTemplate;
     private naturalLanguagePrompt!: PromptTemplate;
     private sqlQueryGeneratorChain!: RunnableSequence;
@@ -29,8 +29,8 @@ class AIService {
     }
 
     private initializeLLM(): void {
-        this.llm = new TogetherAI({
-            apiKey: config.TOGETHER_API_KEY,
+        this.llm = new ChatTogetherAI({
+            togetherAIApiKey: config.TOGETHER_API_KEY,
             modelName: config.TOGETHER_MODEL_NAME,
             temperature: 0.1, // Lower temperature for more consistent SQL queries
             maxTokens: 1000
@@ -39,8 +39,7 @@ class AIService {
 
     private initializePrompts(): void {
         this.sqlQueryPrompt = PromptTemplate.fromTemplate(
-            `You are a SQL expert. Using the provided table schemas, generate an exact SQL query to answer the user's question.
-            Consider the table names mentioned in the question and return ONLY the SQL query without any explanations or markdown formatting.
+            `Act as a SQL expert and use the table schemas and the specified table name in the user's question as a reference to generate the exact SQL query structure that would answer the user's question. Again, consider the table keyword provided in the question and return only the SQL query and nothing else:
 
             Table Schemas:
             {schema}
@@ -50,7 +49,7 @@ class AIService {
         );
 
         this.naturalLanguagePrompt = PromptTemplate.fromTemplate(
-            `You are a SQL expert. Using the provided information, generate a concise and clear natural language response.
+            `Based on the table schema below, question, sql query, and sql response, write and return a natural language response and the sql response:
 
             Table Schemas:
             {schema}
@@ -69,12 +68,7 @@ class AIService {
                 schema: async () => await this.getCachedSchema()
             }),
             this.sqlQueryPrompt,
-            this.llm.withConfig({
-                configurable: {
-                    start: ['```sql'],
-                    stop: ['```']
-                }
-            }),
+            this.llm,
             new StringOutputParser()
         ]);
     }
@@ -112,7 +106,6 @@ class AIService {
             const chainResult = await this.sqlQueryGeneratorChain.invoke({
                 question: userPrompt,
             });
-
             const sqlQuery = this.sanitizeQuery(chainResult);
             logger.info('Generated SQL Query:', sqlQuery);
             return sqlQuery;
