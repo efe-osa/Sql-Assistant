@@ -14,8 +14,19 @@ services:
       dockerfile: ./Dockerfile
     ports:
       - "3001:3001"
-    env_file:
-      - .env.local
+    environment:
+      - TOGETHER_API_KEY=${TOGETHER_API_KEY}
+      - TOGETHER_MODEL=${TOGETHER_MODEL}
+      - TOGETHERAI_API_KEY=${TOGETHERAI_API_KEY}
+      - TOGETHERAI_MODEL_NAME=${TOGETHERAI_MODEL_NAME}
+      - LANGCHAIN_TRACING_V2=${LANGCHAIN_TRACING_V2}
+      - LANGCHAIN_CALLBACKS_BACKGROUND=${LANGCHAIN_CALLBACKS_BACKGROUND}
+      - LANGSMITH_ENDPOINT=${LANGSMITH_ENDPOINT}
+      - LANGSMITH_API_KEY=${LANGSMITH_API_KEY}
+      - LANGSMITH_PROJECT=${LANGSMITH_PROJECT}
+      - SQLITE_DB_PATH=${SQLITE_DB_PATH}
+      - DB_DIR=${DB_DIR}
+
     depends_on:
       sqlite:
         condition: service_healthy
