@@ -5,7 +5,7 @@ import helmet from 'helmet';
 import compression from 'compression';
 import rateLimit from 'express-rate-limit';
 import config from './config';
-import { connectDB } from './config/database';
+import { databaseManager } from './services/database.service';
 import { errorHandler } from './middleware/errorHandler';
 import { logger } from './utils/logger';
 import { sqlRouter } from './routes/sql.routes';
@@ -15,7 +15,13 @@ const port = config.PORT;
 
 // Middleware
 app.use(helmet());
-app.use(cors());
+app.use(cors(
+    {
+        origin: ['http://localhost:3000', 'http://localhost:3001', "https://sql-assistant.netlify.app/"],
+        methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+        allowedHeaders: ['Content-Type', 'Authorization']
+    }
+));
 app.use(compression());
 app.use(express.json());
 app.use(rateLimit({
@@ -37,8 +43,9 @@ app.use(errorHandler);
 // Start server
 const startServer = async () => {
     try {
-        // Connect to database
-        await connectDB();
+        // Initialize default database
+        await databaseManager.initializeDefaultDatabase();
+
         app.listen(port, () => {
             logger.info(`Server is running on port ${port}`);
         });
