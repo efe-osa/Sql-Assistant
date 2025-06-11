@@ -15,15 +15,17 @@ services:
     ports:
       - "3001:3001"
     environment:
-      - TOGETHERAI_API_KEY=tgp_v1_CBw8b1UBS-1XA1zbHdI13oPA9CwudSKicKIOVNX8x5A
-      - TOGETHERAI_MODEL_NAME=meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo
-      - LANGCHAIN_TRACING_V2=true
-      - LANGCHAIN_CALLBACKS_BACKGROUND=true
-      - LANGSMITH_ENDPOINT=https://api.smith.langchain.com
-      - LANGSMITH_API_KEY=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
-      - LANGSMITH_PROJECT=ai-dev-assistant
-      - SQLITE_DB_PATH=/db/cars.db
-      - DB_DIR=./db
+      - TOGETHERAI_API_KEY=${TOGETHERAI_API_KEY}
+      - TOGETHERAI_MODEL_NAME=${TOGETHERAI_MODEL_NAME}
+      - LANGCHAIN_TRACING_V2=${LANGCHAIN_TRACING_V2}
+      - LANGCHAIN_CALLBACKS_BACKGROUND=${LANGCHAIN_CALLBACKS_BACKGROUND}
+      - LANGSMITH_ENDPOINT=${LANGSMITH_ENDPOINT}
+      - LANGSMITH_API_KEY=${LANGSMITH_API_KEY}
+      - LANGSMITH_PROJECT=${LANGSMITH_PROJECT}
+      - SQLITE_DB_PATH=${SQLITE_DB_PATH}
+      - DB_DIR=${DB_DIR}
+    env_file:
+      - .env.local
     depends_on:
       sqlite:
         condition: service_healthy

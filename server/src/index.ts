@@ -17,7 +17,7 @@ const port = config.PORT;
 app.use(helmet());
 app.use(cors(
     {
-        origin: ['http://localhost:3000', 'http://localhost:3001', "https://sql-assistant.netlify.app/"],
+        origin: ['http://localhost:3000', 'http://localhost:3001', "https://sql-assistant-server.up.railway.app"],
         methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
         allowedHeaders: ['Content-Type', 'Authorization']
     }
