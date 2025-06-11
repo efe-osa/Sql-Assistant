@@ -18,7 +18,7 @@ export class CarPart {
     manufacture_start_date!: Date;
 
     @Column({ nullable: true })
-    manufacture_end_date!: Date | null;
+    manufacture_end_date!: Date ;
 
     @Column({ default: false })
     part_recall!: boolean;
