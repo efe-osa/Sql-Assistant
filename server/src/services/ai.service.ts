@@ -13,7 +13,7 @@ class AIService {
     private naturalLanguagePrompt!: PromptTemplate;
     private sqlQueryGeneratorChain!: RunnableSequence;
     private schemaCache: Map<string, string> = new Map();
-    private readonly CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+    private readonly CACHE_TTL = 15 * 60 * 1000; // 15 minutes
 
     private constructor() {
         this.initializeLLM();
@@ -32,7 +32,7 @@ class AIService {
         this.llm = new ChatTogetherAI({
             togetherAIApiKey: config.TOGETHER_API_KEY,
             modelName: config.TOGETHER_MODEL_NAME,
-            temperature: 0.1, // Lower temperature for more consistent SQL queries
+            temperature: 0.1,
             maxTokens: 1000
         });
     }
@@ -97,16 +97,12 @@ class AIService {
         }
     }
 
-    private sanitizeQuery(query: string): string {
-        return query.replace(/```(sql)?/gi, '').trim();
-    }
-
     async generateSQLQuery(userPrompt: string): Promise<string> {
         try {
             const chainResult = await this.sqlQueryGeneratorChain.invoke({
                 question: userPrompt,
             });
-            const sqlQuery = this.sanitizeQuery(chainResult);
+            const sqlQuery = chainResult.trim();
             logger.info('Generated SQL Query:', sqlQuery);
             return sqlQuery;
         } catch (error) {
@@ -124,7 +120,7 @@ class AIService {
                 {
                     schema: async () => await this.getCachedSchema(),
                     question: (input: { question: string }) => input.question,
-                    query: (input: { query: string }) => this.sanitizeQuery(input.query),
+                    query: (input: { query: string }) => input.query.trim(),
                     response: async (input: { query: string }) => {
                         try {
                             return await databaseManager.getDefaultConnection().sqlDb.run(input.query);
