@@ -15,8 +15,6 @@ services:
     ports:
       - "3001:3001"
     environment:
-      - TOGETHER_API_KEY=${TOGETHER_API_KEY}
-      - TOGETHER_MODEL=${TOGETHER_MODEL}
       - TOGETHERAI_API_KEY=${TOGETHERAI_API_KEY}
       - TOGETHERAI_MODEL_NAME=${TOGETHERAI_MODEL_NAME}
       - LANGCHAIN_TRACING_V2=${LANGCHAIN_TRACING_V2}
@@ -26,7 +24,8 @@ services:
       - LANGSMITH_PROJECT=${LANGSMITH_PROJECT}
       - SQLITE_DB_PATH=${SQLITE_DB_PATH}
       - DB_DIR=${DB_DIR}
-
+    env_file:
+      - .env.local
     depends_on:
       sqlite:
         condition: service_healthy
